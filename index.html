@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Neon Glow Calculator</title>
+  <style>
+    body {
+      background: #f1f1f1;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .calculator {
+      background: #222;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .display {
+      background: #000;
+      color: #00ff00;
+      font-size: 32px;
+      text-align: right;
+      padding: 10px 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 10px #00ff00;
+      height: 50px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 10px;
+    }
+
+    .buttons button {
+      font-size: 18px;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #333;
+      color: #00ffee;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 8px #00ffee, 0 0 16px #00ffee;
+    }
+
+    .buttons button:hover {
+      background: #555;
+      box-shadow: 0 0 12px #00ffee, 0 0 20px #00ffee;
+    }
+
+    h2 {
+      margin-top: 30px;
+      font-weight: bold;
+    }
+
+    #history {
+      margin-top: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      background: #fff;
+      width: 300px;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <button onclick="clearDisplay()">C</button>
+      <button onclick="append('%')">%</button>
+      <button onclick="append('√')">√</button>
+      <button onclick="append('^')">^</button>
+      <button onclick="deleteChar()">⌫</button>
+
+      <button onclick="append('7')">7</button>
+      <button onclick="append('8')">8</button>
+      <button onclick="append('9')">9</button>
+      <button onclick="append('÷')">÷</button>
+      <button onclick="append('*')">×</button>
+
+      <button onclick="append('4')">4</button>
+      <button onclick="append('5')">5</button>
+      <button onclick="append('6')">6</button>
+      <button onclick="append('-')">−</button>
+      <button onclick="append('+')">+</button>
+
+      <button onclick="append('1')">1</button>
+      <button onclick="append('2')">2</button>
+      <button onclick="append('3')">3</button>
+      <button onclick="toggleSign()">±</button>
+      <button onclick="calculate()">=</button>
+
+      <button onclick="append('0')">0</button>
+      <button onclick="append('.')">.</button>
+      <button onclick="reciprocal()">1/x</button>
+      <button onclick="memoryAdd()">M+</button>
+      <button onclick="memorySubtract()">M-</button>
+
+      <button onclick="memoryRecall()">MR</button>
+      <button onclick="memoryClear()">MC</button>
+    </div>
+  </div>
+
+  <h2>History</h2>
+  <div id="history"></div>
+
+  <script>
+    const display = document.getElementById('display');
+    const historyEl = document.getElementById('history');
+    let memory = 0;
+
+    function clearDisplay() {
+      display.textContent = '0';
+    }
+
+    function deleteChar() {
+      display.textContent = display.textContent.slice(0, -1) || '0';
+    }
+
+    function append(char) {
+      if (display.textContent === '0' && !['+', '-', '*', '/', '.', '^', '%'].includes(char)) {
+        display.textContent = char;
+      } else {
+        display.textContent += char;
+      }
+    }
+
+    function toggleSign() {
+      let val = parseFloat(display.textContent);
+      display.textContent = (-val).toString();
+    }
+
+    function reciprocal() {
+      let value = parseFloat(display.textContent);
+      if (value !== 0) {
+        const result = 1 / value;
+        addToHistory('1/(' + value + ') = ' + result);
+        display.textContent = result;
+      } else {
+        display.textContent = 'Error';
+      }
+    }
+
+    function memoryAdd() {
+      memory += parseFloat(display.textContent);
+    }
+
+    function memorySubtract() {
+      memory -= parseFloat(display.textContent);
+    }
+
+    function memoryRecall() {
+      display.textContent = memory.toString();
+    }
+
+    function memoryClear() {
+      memory = 0;
+    }
+
+    function calculate() {
+      let expression = display.textContent
+        .replace(/÷/g, '/')
+        .replace(/×/g, '*')
+        .replace(/√/g, 'Math.sqrt')
+        .replace(/\^/g, '**');
+      try {
+        let result = eval(expression);
+        addToHistory(display.textContent + ' = ' + result);
+        display.textContent = result;
+      } catch {
+        display.textContent = 'Error';
+      }
+    }
+
+    function addToHistory(entry) {
+      const item = document.createElement('div');
+      item.textContent = entry;
+      historyEl.prepend(item);
+    }
+  </script>
+</body>
+</html>
